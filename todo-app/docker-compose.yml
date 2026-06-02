@@ -1,0 +1,25 @@
+# Spins up a PostgreSQL 16 database for the Todo app.
+# Start it with:   docker-compose up -d
+# Stop it with:    docker-compose down        (add -v to also wipe the volume)
+services:
+  postgres:
+    image: postgres:16
+    container_name: tododb
+    environment:
+      POSTGRES_DB: tododb
+      POSTGRES_USER: todo
+      POSTGRES_PASSWORD: todo
+    ports:
+      # host:container — exposes the DB on localhost:5432 for Quarkus.
+      - "5432:5432"
+    volumes:
+      # Named volume so your data survives container restarts.
+      - tododb_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U todo -d tododb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  tododb_data:
